@@ -3440,7 +3440,24 @@ impl Session {
     /// stamps' "By" line has them. Cut to [`MAX_STAMP_LINE`] characters.
     pub fn stamp_line(&self, template: &str, author: &str) -> String {
         let (date, time) = self.stamp_date_time();
-        let filled = template.trim().replace("{name}", author.trim()).replace("{date}", &date).replace("{time}", &time);
+        let mut filled = String::new();
+        let mut remaining = template.trim();
+        while !remaining.is_empty() {
+            if let Some(rest) = remaining.strip_prefix("{name}") {
+                filled.push_str(author.trim());
+                remaining = rest;
+            } else if let Some(rest) = remaining.strip_prefix("{date}") {
+                filled.push_str(&date);
+                remaining = rest;
+            } else if let Some(rest) = remaining.strip_prefix("{time}") {
+                filled.push_str(&time);
+                remaining = rest;
+            } else {
+                let ch = remaining.chars().next().expect("remaining is not empty");
+                filled.push(ch);
+                remaining = &remaining[ch.len_utf8()..];
+            }
+        }
         filled.chars().take(MAX_STAMP_LINE).collect()
     }
 

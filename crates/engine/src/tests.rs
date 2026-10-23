@@ -7294,6 +7294,7 @@ fn exporting_office_keeps_dotted_leader_entries_as_paragraphs() {
 fn stamp_lines_fill_in_the_name_date_and_time() {
     let s = Session::new().with_clock(|| 1_700_000_000);
     assert_eq!(s.stamp_line("Received {date} {time} by {name}", " Ada "), "Received Nov 14, 2023 10:13 pm by Ada");
+    assert_eq!(s.stamp_line("By {name} — {date} {time}", "Ada {date} {time}"), "By Ada {date} {time} — Nov 14, 2023 10:13 pm");
     assert_eq!(s.stamp_by_line("Ada"), "By Ada at 10:13 pm, Nov 14, 2023");
     assert_eq!(s.stamp_by_line(""), "at 10:13 pm, Nov 14, 2023");
     assert_eq!(s.stamp_line(&"{date}".repeat(100), "Ada").chars().count(), MAX_STAMP_LINE);
